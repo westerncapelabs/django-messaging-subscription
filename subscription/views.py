@@ -35,4 +35,3 @@ def uploader(request, page_name):
         context.update(csrf(request))
         return render_to_response("custom_admin/upload.html", context,
                                   context_instance=RequestContext(request))
-

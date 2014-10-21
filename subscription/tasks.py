@@ -47,10 +47,13 @@ def ensure_one_subscription():
     Runs daily
     """
     cursor = connection.cursor()
-    cursor.execute("UPDATE subscription_subscription SET active = False WHERE id NOT IN \
-              (SELECT MAX(id) as id FROM subscription_subscription GROUP BY to_addr)")
+    cursor.execute("UPDATE subscription_subscription SET active = False \
+                    WHERE id NOT IN \
+                   (SELECT MAX(id) as id FROM \
+                    subscription_subscription GROUP BY to_addr)")
     affected = cursor.rowcount
-    vumi_fire_metric.delay(metric="subscription.duplicates", value=affected, agg="last")
+    vumi_fire_metric.delay(
+        metric="subscription.duplicates", value=affected, agg="last")
     return affected
 
 
@@ -66,14 +69,18 @@ def vumi_fire_metric(metric, value, agg, sender=None):
         sender.fire_metric(metric, value, agg=agg)
         return sender
     except SoftTimeLimitExceeded:
-        standard_logger.error('Soft time limit exceed processing metric fire to Vumi HTTP API via Celery', exc_info=True)
+        standard_logger.error(
+            'Soft time limit exceed processing metric fire to Vumi \
+            HTTP API via Celery',
+            exc_info=True)
 
 
 @task()
 def process_message_queue(schedule, sender=None):
     # Get all active and incomplete subscribers for schedule
     subscribers = Subscription.objects.filter(
-        schedule=schedule, active=True, completed=False, process_status=0).all()
+        schedule=schedule, active=True, completed=False,
+        process_status=0).all()
 
     # Make a reusable session to Vumi
     if sender is None:
@@ -83,9 +90,9 @@ def process_message_queue(schedule, sender=None):
             conversation_token=settings.VUMI_GO_ACCOUNT_TOKEN
         )
         # sender = LoggingSender('go_http.test')
-            # Fire off message processor for each
+        # Fire off message processor for each
     for subscriber in subscribers:
-        subscriber.process_status = 1 # In Proceses
+        subscriber.process_status = 1  # In Proceses
         subscriber.save()
         processes_message.delay(subscriber, sender)
     return subscribers.count()
@@ -103,13 +110,14 @@ def processes_message(subscriber, sender):
             response = sender.send_text(subscriber.to_addr, message.content)
             # Post process moving to next message, next set or finished
             # Get set max
-            set_max = Message.objects.all().aggregate(Max('sequence_number'))["sequence_number__max"]
+            set_max = Message.objects.all().aggregate(
+                Max('sequence_number'))["sequence_number__max"]
             # Compare user position to max
             if subscriber.next_sequence_number == set_max:
                 # Mark current as completed
                 subscriber.completed = True
                 subscriber.active = False
-                subscriber.process_status = 2 # Completed
+                subscriber.process_status = 2  # Completed
                 subscriber.save()
                 # If next set defined create new subscription
                 message_set = subscriber.message_set
@@ -117,7 +125,7 @@ def processes_message(subscriber, sender):
                     # clone existing minus PK as recommended in
                     # https://docs.djangoproject.com/en/1.6/topics/db/queries/#copying-model-instances
                     subscriber.pk = None
-                    subscriber.process_status = 0 # Ready
+                    subscriber.process_status = 0  # Ready
                     subscriber.active = True
                     subscriber.completed = False
                     subscriber.next_sequence_number = 1
@@ -126,13 +134,17 @@ def processes_message(subscriber, sender):
                     subscription.save()
             else:
                 # More in this set so interate by one
-                subscriber.next_sequence_number = subscriber.next_sequence_number + 1
-                subscriber.process_status = 0 # Ready
+                subscriber.next_sequence_number = subscriber.next_sequence_number + \
+                    1
+                subscriber.process_status = 0  # Ready
                 subscriber.save()
             return response
         except ObjectDoesNotExist:
-            subscriber.process_status = -1 # Errored
+            subscriber.process_status = -1  # Errored
             subscriber.save()
             celery_logger.error('Missing subscription message', exc_info=True)
     except SoftTimeLimitExceeded:
-        celery_logger.error('Soft time limit exceed processing message to Vumi HTTP API via Celery', exc_info=True)
+        celery_logger.error(
+            'Soft time limit exceed processing message to Vumi \
+            HTTP API via Celery',
+            exc_info=True)

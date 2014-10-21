@@ -24,4 +24,3 @@ urlpatterns = patterns('',
                            'subscription.views.uploader',
                            {'page_name': 'csv_uploader'}, name="csv_uploader"),
                        )
-

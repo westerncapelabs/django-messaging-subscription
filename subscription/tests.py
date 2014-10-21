@@ -5,10 +5,9 @@ from tastypie.test import ResourceTestCase
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core import management
 from django.test.utils import override_settings
 from subscription.models import MessageSet, Message, Subscription
-from subscription.tasks import (ingest_csv, ensure_one_subscription,
+from subscription.tasks import (ingest_csv,
                                 vumi_fire_metric, process_message_queue,
                                 processes_message)
 from djcelery.models import PeriodicTask
@@ -17,6 +16,7 @@ from go_http.send import LoggingSender, HttpApiSender
 from StringIO import StringIO
 import json
 import logging
+
 
 class SubscriptionResourceTest(ResourceTestCase):
     fixtures = ["initial_data"]
@@ -28,7 +28,8 @@ class SubscriptionResourceTest(ResourceTestCase):
         self.username = 'testuser'
         self.password = 'testpass'
         self.user = User.objects.create_user(self.username,
-            'testuser@example.com', self.password)
+                                             'testuser@example.com',
+                                             self.password)
         self.api_key = self.user.api_key.key
 
     def get_credentials(self):
@@ -42,13 +43,17 @@ class SubscriptionResourceTest(ResourceTestCase):
         })
 
     def test_get_list_unauthorzied(self):
-        self.assertHttpUnauthorized(self.api_client.get('/api/v1/subscription/', format='json'))
+        self.assertHttpUnauthorized(self.api_client.get(
+                                    '/api/v1/subscription/',
+                                    format='json'))
 
     def test_api_keys_created(self):
         self.assertEqual(True, self.api_key is not None)
 
     def test_get_list_json(self):
-        resp = self.api_client.get('/api/v1/subscription/', format='json', authentication=self.get_credentials())
+        resp = self.api_client.get('/api/v1/subscription/',
+                                   format='json',
+                                   authentication=self.get_credentials())
         self.assertValidJSONResponse(resp)
 
         # Scope out the data for correctness.
@@ -76,8 +81,10 @@ class SubscriptionResourceTest(ResourceTestCase):
             "to_addr": json_item['to_addr']
         }
 
-        resp = self.api_client.get('/api/v1/subscription/', data=filter_data,
-                                   format='json', authentication=self.get_credentials())
+        resp = self.api_client.get('/api/v1/subscription/',
+                                   data=filter_data,
+                                   format='json',
+                                   authentication=self.get_credentials())
         self.assertValidJSONResponse(resp)
 
         # Scope out the data for correctness.
@@ -108,11 +115,14 @@ class SubscriptionResourceTest(ResourceTestCase):
             "lang": "en"
         }
 
-        resp = self.api_client.get('/api/v1/subscription/', data=filter_data,
-                                   format='json', authentication=self.get_credentials())
+        resp = self.api_client.get('/api/v1/subscription/',
+                                   data=filter_data,
+                                   format='json',
+                                   authentication=self.get_credentials())
         json_item = json.loads(resp.content)
         self.assertHttpBadRequest(resp)
-        self.assertEqual("The 'lang' field does not allow filtering.", json_item["error"])
+        self.assertEqual("The 'lang' field does not allow filtering.",
+                         json_item["error"])
 
     def test_post_subscription_with_non_existent_schedule_ref(self):
         data = {
@@ -122,7 +132,7 @@ class SubscriptionResourceTest(ResourceTestCase):
             "lang": "en",
             "next_sequence_number": 1,
             "resource_uri": "/api/v1/subscription/1/",
-            "schedule": "/api/v1/periodic_task/10/", # Non existent task
+            "schedule": "/api/v1/periodic_task/10/",  # Non existent task
             "to_addr": "+271234",
             "user_account": "80493284823"
         }
@@ -132,7 +142,7 @@ class SubscriptionResourceTest(ResourceTestCase):
                                         data=data)
         json_item = json.loads(response.content)
         self.assertHttpBadRequest(response)
-        self.assertEqual("Could not find the provided object via resource URI " \
+        self.assertEqual("Could not find the provided object via resource URI "
                          "'/api/v1/periodic_task/10/'.", json_item["error"])
 
     def test_post_subscription_good(self):
@@ -167,14 +177,16 @@ class TestUploadCSV(TestCase):
     fixtures = ["initial_data"]
 
     MSG_HEADER = (
-        "message_id,en,safe,af,safe,zu,safe,xh,safe,ve,safe,tn,safe,ts,safe,ss,safe,st,safe,nso,safe,nr,safe\r\n")
+        "message_id,en,safe,af,safe,zu,safe,xh,safe,ve,safe,tn,safe,ts,safe,\
+        ss,safe,st,safe,nso,safe,nr,safe\r\n")
     MSG_LINE_CLEAN_1 = (
         "1,hello,0,hello1,0,hell2,0,,0,,0,,0,,0,,0,,0,,0,hello3,0\r\n")
     MSG_LINE_CLEAN_2 = (
-        "2,goodbye,0,goodbye1,0,goodbye2,0,,0,,0,,0,,0,,0,,0,,0,goodbye3,0\r\n")
-    MSG_LINE_DIRTY_1= (
-        "A,sequence_number_is_text,0,goodbye1,0,goodbye2,0,,0,,0,,0,,0,,0,,0,,0,goodbye3,0\r\n")
-
+        "2,goodbye,0,goodbye1,0,goodbye2,0,,0,,0,,0,,0,,0,,0,,0,goodbye3,\
+        0\r\n")
+    MSG_LINE_DIRTY_1 = (
+        "A,sequence_number_is_text,0,goodbye1,0,goodbye2,0,,0,,0,,0,,0,,0,,\
+        0,,0,goodbye3,0\r\n")
 
     def setUp(self):
         self.admin = User.objects.create_superuser(
@@ -204,9 +216,11 @@ class TestUploadCSV(TestCase):
         self.assertEquals(imported_nr.content, "hello3")
         imported_en = Message.objects.filter(sequence_number="2", lang="en")[0]
         self.assertEquals(imported_en.content, "goodbye")
-        imported_af2 = Message.objects.filter(sequence_number="2", lang="af")[0]
+        imported_af2 = Message.objects.filter(sequence_number="2",
+                                              lang="af")[0]
         self.assertEquals(imported_af2.content, "goodbye1")
-        imported_nr2 = Message.objects.filter(sequence_number="2", lang="nr")[0]
+        imported_nr2 = Message.objects.filter(sequence_number="2",
+                                              lang="nr")[0]
         self.assertEquals(imported_nr2.content, "goodbye3")
 
     def test_upload_csv_dirty(self):
@@ -225,10 +239,9 @@ class TestEnsureCleanSubscriptions(TestCase):
 
     fixtures = ["initial_data", "test"]
 
-    @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS = True,
-                       CELERY_ALWAYS_EAGER = True,
-                       BROKER_BACKEND = 'memory',)
-
+    @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+                       CELERY_ALWAYS_EAGER=True,
+                       BROKER_BACKEND='memory',)
     def setUp(self):
         self.sender = LoggingSender('go_http.test')
         self.handler = RecordingHandler()
@@ -250,8 +263,9 @@ class TestEnsureCleanSubscriptions(TestCase):
     #     self.assertEqual(results.get(), 1)
 
     def test_fire_metric(self):
-        results = vumi_fire_metric.delay(metric="subscription.duplicates", value=1,
-                                         agg="last", sender=self.sender)
+        vumi_fire_metric.delay(metric="subscription.duplicates", value=1,
+                               agg="last", sender=self.sender)
+
         self.check_logs("Metric: 'subscription.duplicates' [last] -> 1")
 
 
@@ -259,9 +273,9 @@ class TestMessageQueueProcessor(TestCase):
 
     fixtures = ["initial_data", "test_subsend"]
 
-    @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS = True,
-                       CELERY_ALWAYS_EAGER = True,
-                       BROKER_BACKEND = 'memory',)
+    @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+                       CELERY_ALWAYS_EAGER=True,
+                       BROKER_BACKEND='memory',)
     def setUp(self):
         # management.call_command(
         #     'loaddata', 'test_subsend.json', verbosity=0)
@@ -325,7 +339,7 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check another added and old still there
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription),6)
+        self.assertEquals(len(all_subscription), 6)
         # Check new subscription is for baby1
         new_subscription = Subscription.objects.get(pk=6)
         self.assertEquals(new_subscription.message_set.pk, 4)
@@ -337,7 +351,7 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check no new subscription added
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription),5)
+        self.assertEquals(len(all_subscription), 5)
         # Check old one now inactive and complete
         subscriber_updated = Subscription.objects.get(pk=4)
         self.assertEquals(subscriber_updated.completed, True)
