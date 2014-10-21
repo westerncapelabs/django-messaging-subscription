@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, url, include
-from subscription import api
+from django.contrib import admin
 from tastypie.api import Api
-from celery_app import views
 
+from subscription import api
+
+admin.autodiscover()
 
 # Setting the API base name and registering the API resources using
 # Tastypies API function
@@ -16,7 +18,10 @@ api_resources.prepend_urls()
 
 # Setting the urlpatterns to hook into the api urls
 urlpatterns = patterns('',
-    url(r'^api/', include(api_resources.urls)),
-    url(r'^$', views.create_task),
-    url(r'^result/(?P<task_id>.+)/$', views.task_result, name='task_result'),
-)
+                       url(r'^admin/', include(admin.site.urls)),
+                       url(r'^api/', include(api_resources.urls)),
+                       url(r'^admin/subscription/upload/',
+                           'subscription.views.uploader',
+                           {'page_name': 'csv_uploader'}, name="csv_uploader"),
+                       )
+

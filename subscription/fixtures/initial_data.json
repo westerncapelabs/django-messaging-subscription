@@ -179,7 +179,7 @@
     "pk": 1,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Daily - 9am",
         "exchange": null,
         "last_run_at": null,
@@ -200,7 +200,7 @@
     "pk": 2,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Monday only - 9.15am",
         "exchange": null,
         "last_run_at": null,
@@ -221,7 +221,7 @@
     "pk": 3,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Monday and Thursday - 9.30am",
         "exchange": null,
         "last_run_at": null,
@@ -242,7 +242,7 @@
     "pk": 4,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Monday and Wednesday and Friday - 9.45am",
         "exchange": null,
         "last_run_at": null,
@@ -263,7 +263,7 @@
     "pk": 5,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Monday, Tuesday, Wednesday and Friday - 10am",
         "exchange": null,
         "last_run_at": null,
@@ -284,7 +284,7 @@
     "pk": 6,
     "model": "djcelery.periodictask",
     "fields": {
-        "task": "subsend.tasks.process_message_queue",
+        "task": "subscription.tasks.process_message_queue",
         "name": "Weekdays - 10.15am",
         "exchange": null,
         "last_run_at": null,
