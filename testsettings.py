@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     # Third-party apps
     'south',
     'tastypie',
+    'djcelery',
     # Us
     'subscription'
 ]
