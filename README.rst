@@ -1,11 +1,9 @@
 django-messaging-subscription
-=============================
+================================
 
 A RESTful API for managing messaging content, subscriptions and sending 
 via Vumi-go
 
-Requires 'south', 'tastypie', 'djcelery', 'subscription' to be added to
-INSTALLED_APPS
 
 ::
 
@@ -14,3 +12,30 @@ INSTALLED_APPS
     (ve)$ pip install -r requirements.txt
     (ve)$ pip install -r requirements-dev.txt
     (ve)$ py.test --ds=testsettings subscription/tests.py --cov=subscription
+
+
+Configuration
+-------------------------------
+
+The following configuration (with dummy values replaced by real ones) needs to
+be added to ``settings.py`` to configure this app::
+
+    INSTALLED_APPS = [
+        # Usual Django stuff plus
+        # Third-party apps
+        'south',
+        'tastypie',
+        'djcelery',
+        # Us
+        'subscription'
+    ]
+
+    VUMI_GO_ACCOUNT_KEY = "replaceme"
+    VUMI_GO_CONVERSATION_KEY = "replaceme"
+    VUMI_GO_ACCOUNT_TOKEN = "replaceme"
+
+    CELERY_ACCEPT_CONTENT = ['pickle']
+    CELERY_TASK_SERIALIZER = 'pickle'
+    CELERY_RESULT_SERIALIZER = 'pickle'
+    CELERY_ALWAYS_EAGER = DEBUG
+
