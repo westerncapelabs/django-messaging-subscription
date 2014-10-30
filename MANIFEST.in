@@ -1,0 +1,11 @@
+# Source distribution files.
+include LICENSE
+include README.rst
+include requirements.txt
+include setup.py
+recursive-include subscription/fixtures *
+recursive-include subscription/migrations *
+recursive-include subscription/templates *
+
+# Prune stray bytecode files.
+global-exclude *.pyc
