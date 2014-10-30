@@ -19,7 +19,7 @@ import logging
 
 
 class SubscriptionResourceTest(ResourceTestCase):
-    fixtures = ["initial_data"]
+    fixtures = ["test"]
 
     def setUp(self):
         super(SubscriptionResourceTest, self).setUp()
@@ -57,7 +57,7 @@ class SubscriptionResourceTest(ResourceTestCase):
         self.assertValidJSONResponse(resp)
 
         # Scope out the data for correctness.
-        self.assertEqual(len(self.deserialize(resp)['objects']), 0)
+        self.assertEqual(len(self.deserialize(resp)['objects']), 3)
 
     def test_get_filtered_list_json(self):
         data = {
@@ -88,7 +88,7 @@ class SubscriptionResourceTest(ResourceTestCase):
         self.assertValidJSONResponse(resp)
 
         # Scope out the data for correctness.
-        self.assertEqual(len(self.deserialize(resp)['objects']), 1)
+        self.assertEqual(len(self.deserialize(resp)['objects']), 2)
 
     def test_get_filtered_list_denied_json(self):
         data = {
@@ -107,7 +107,7 @@ class SubscriptionResourceTest(ResourceTestCase):
                                         data=data)
         json_item = json.loads(response.content)
 
-        print json_item
+        # print json_item
 
         filter_data = {
             "user_account": json_item['user_account'],
@@ -174,7 +174,7 @@ class SubscriptionResourceTest(ResourceTestCase):
 
 class TestUploadCSV(TestCase):
 
-    fixtures = ["initial_data"]
+    fixtures = ["test"]
 
     MSG_HEADER = (
         "message_id,en,safe,af,safe,zu,safe,xh,safe,ve,safe,tn,safe,ts,safe,\
@@ -191,6 +191,8 @@ class TestUploadCSV(TestCase):
     def setUp(self):
         self.admin = User.objects.create_superuser(
             'test', 'test@example.com', "pass123")
+        # Start with clean
+        Message.objects.all().delete()
 
     def test_upload_view_not_logged_in_blocked(self):
         response = self.client.get(reverse("csv_uploader"))
@@ -271,7 +273,7 @@ class TestEnsureCleanSubscriptions(TestCase):
 
 class TestMessageQueueProcessor(TestCase):
 
-    fixtures = ["initial_data", "test_subsend"]
+    fixtures = ["test", "test_subsend"]
 
     @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
                        CELERY_ALWAYS_EAGER=True,
