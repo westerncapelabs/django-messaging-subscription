@@ -5,11 +5,15 @@ from djcelery.models import PeriodicTask
 
 from django.utils import timezone
 from django.db.models import DateTimeField
+from django.conf import settings
+
+from go_http.send import HttpApiSender as sendHttpApiSender
 
 
 # Modelled on https://github.com/jamesmarlowe/django-AutoDateTimeFields
 # But with timezone support
 class AutoDateTimeField(DateTimeField):
+
     def pre_save(self, model_instance, add):
         now = timezone.now()
         setattr(model_instance, self.attname, now)
@@ -17,6 +21,7 @@ class AutoDateTimeField(DateTimeField):
 
 
 class AutoNewDateTimeField(DateTimeField):
+
     def pre_save(self, model_instance, add):
         if not add:
             return getattr(model_instance, self.attname)
@@ -26,6 +31,7 @@ class AutoNewDateTimeField(DateTimeField):
 
 
 class MessageSet(models.Model):
+
     """ Core details about a set of messages that a user
         can be sent
     """
@@ -42,6 +48,7 @@ class MessageSet(models.Model):
 
 
 class Message(models.Model):
+
     """ A message that a user can be sent
     """
     message_set = models.ForeignKey(MessageSet,
@@ -59,6 +66,7 @@ class Message(models.Model):
 
 
 class Subscription(models.Model):
+
     """ Users subscriptions and their status
     """
     user_account = models.CharField(max_length=36, null=False, blank=False)
@@ -98,3 +106,17 @@ user_model = get_user_model()
 def create_user_api_key(sender, **kwargs):
     from tastypie.models import create_api_key
     create_api_key(user_model, **kwargs)
+
+
+@receiver(post_save, sender=Subscription)
+def send_optional_first_message(sender, instance, created, **kwargs):
+    if created and settings.SUBSCRIPTION_SEND_INITIAL_DELAYED > 0:
+        from subscription.tasks import processes_message
+        api_client = sendHttpApiSender(
+            account_key=settings.VUMI_GO_ACCOUNT_KEY,
+            conversation_key=settings.VUMI_GO_CONVERSATION_KEY,
+            conversation_token=settings.VUMI_GO_ACCOUNT_TOKEN
+        )
+        processes_message.delay(
+            instance, api_client,
+            countdown=settings.SUBSCRIPTION_SEND_INITIAL_DELAYED)

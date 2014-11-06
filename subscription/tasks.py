@@ -4,7 +4,7 @@ from celery.utils.log import get_task_logger
 from go_http import HttpApiSender
 from go_http.send import HttpApiSender as sendHttpApiSender
 import csv
-from subscription.models import Message, Subscription
+from .models import Message, Subscription
 from django.conf import settings
 from django.db import IntegrityError, transaction, connection
 from django.db.models import Max
