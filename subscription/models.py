@@ -117,6 +117,6 @@ def send_optional_first_message(sender, instance, created, **kwargs):
             conversation_key=settings.VUMI_GO_CONVERSATION_KEY,
             conversation_token=settings.VUMI_GO_ACCOUNT_TOKEN
         )
-        processes_message.delay(
-            instance, api_client,
-            countdown=settings.SUBSCRIPTION_SEND_INITIAL_DELAYED)
+
+        processes_message.apply_async(args=[instance, api_client], 
+                countdown=settings.SUBSCRIPTION_SEND_INITIAL_DELAYED)
