@@ -64,7 +64,7 @@
         "to_addr": "+271112",
         "updated_at": "2014-07-23T13:48:05.720Z",
         "message_set": 5,
-        "next_sequence_number": 2,
+        "next_sequence_number": 3,
         "active": true,
         "contact_key": "82309423002",
         "created_at": "2014-07-23T13:42:00Z",
@@ -159,6 +159,18 @@
         "content": "Message 2 in en on baby2",
         "message_set": 5,
         "sequence_number": 2
+    }
+},
+{
+    "pk": 7,
+    "model": "subscription.message",
+    "fields": {
+        "lang": "en",
+        "created_at": "2014-07-23T21:14:45.374Z",
+        "updated_at": "2014-07-23T21:14:45.374Z",
+        "content": "Message 3 in en on baby2",
+        "message_set": 5,
+        "sequence_number": 3
     }
 }
 ]
