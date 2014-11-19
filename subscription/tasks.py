@@ -77,8 +77,8 @@ def vumi_fire_metric(metric, value, agg, sender=None):
 
 @task()
 def process_message_queue(schedule, sender=None):
-    # Get all active and incomplete subscribers for schedule
-    subscribers = Subscription.objects.filter(
+    # Get all active and incomplete subscriptions for schedule
+    subscriptions = Subscription.objects.filter(
         schedule=schedule, active=True, completed=False,
         process_status=0).all()
 
@@ -91,59 +91,59 @@ def process_message_queue(schedule, sender=None):
         )
         # sender = LoggingSender('go_http.test')
         # Fire off message processor for each
-    for subscriber in subscribers:
-        subscriber.process_status = 1  # In Proceses
-        subscriber.save()
-        processes_message.delay(subscriber.id, sender)
-    return subscribers.count()
+    for subscription in subscriptions:
+        subscription.process_status = 1  # In Proceses
+        subscription.save()
+        processes_message.delay(subscription.id, sender)
+    return subscriptions.count()
 
 
 @task()
-def processes_message(subscriber_id, sender):
+def processes_message(subscription_id, sender):
     try:
         # Get next message
         try:
-            subscriber = Subscription.objects.get(id=subscriber_id)
+            subscription = Subscription.objects.get(id=subscription_id)
             message = Message.objects.get(
-                message_set=subscriber.message_set, lang=subscriber.lang,
-                sequence_number=subscriber.next_sequence_number)
+                message_set=subscription.message_set, lang=subscription.lang,
+                sequence_number=subscription.next_sequence_number)
             # Send message
-            response = sender.send_text(subscriber.to_addr, message.content)
+            response = sender.send_text(subscription.to_addr, message.content)
             # Post process moving to next message, next set or finished
             # Get set max
             set_max = Message.objects.filter(
-                message_set=subscriber.message_set
+                message_set=subscription.message_set
                 ).aggregate(Max('sequence_number'))["sequence_number__max"]
             # Compare user position to max
-            if subscriber.next_sequence_number == set_max:
+            if subscription.next_sequence_number == set_max:
                 # Mark current as completed
-                subscriber.completed = True
-                subscriber.active = False
-                subscriber.process_status = 2  # Completed
-                subscriber.save()
+                subscription.completed = True
+                subscription.active = False
+                subscription.process_status = 2  # Completed
+                subscription.save()
                 # If next set defined create new subscription
-                message_set = subscriber.message_set
+                message_set = subscription.message_set
                 if message_set.next_set:
                     # clone existing minus PK as recommended in
                     # https://docs.djangoproject.com/en/1.6/topics/db/queries/#copying-model-instances
-                    subscriber.pk = None
-                    subscriber.process_status = 0  # Ready
-                    subscriber.active = True
-                    subscriber.completed = False
-                    subscriber.next_sequence_number = 1
-                    subscription = subscriber
-                    subscription.message_set = message_set.next_set
-                    subscription.save()
+                    subscription.pk = None
+                    subscription.process_status = 0  # Ready
+                    subscription.active = True
+                    subscription.completed = False
+                    subscription.next_sequence_number = 1
+                    subscription_new = subscription
+                    subscription_new.message_set = message_set.next_set
+                    subscription_new.save()
             else:
                 # More in this set so interate by one
-                subscriber.next_sequence_number = subscriber.next_sequence_number + \
+                subscription.next_sequence_number = subscription.next_sequence_number + \
                     1
-                subscriber.process_status = 0  # Ready
-                subscriber.save()
+                subscription.process_status = 0  # Ready
+                subscription.save()
             return response
         except ObjectDoesNotExist:
-            subscriber.process_status = -1  # Errored
-            subscriber.save()
+            subscription.process_status = -1  # Errored
+            subscription.save()
             celery_logger.error('Missing subscription message', exc_info=True)
     except SoftTimeLimitExceeded:
         celery_logger.error(
