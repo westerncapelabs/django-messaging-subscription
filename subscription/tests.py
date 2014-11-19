@@ -306,7 +306,7 @@ class TestMessageQueueProcessor(TestCase):
 
     def test_send_message_1_en_accelerated(self):
         subscriber = Subscription.objects.get(pk=1)
-        result = processes_message.delay(subscriber, self.sender)
+        result = processes_message.delay(subscriber.id, self.sender)
         self.assertEqual(result.get(), {
             "message_id": result.get()["message_id"],
             "to_addr": "+271234",
@@ -318,7 +318,7 @@ class TestMessageQueueProcessor(TestCase):
 
     def test_next_message_2_post_send_en_accelerated(self):
         subscriber = Subscription.objects.get(pk=1)
-        result = processes_message.delay(subscriber, self.sender)
+        result = processes_message.delay(subscriber.id, self.sender)
         self.assertTrue(result.successful())
         subscriber_updated = Subscription.objects.get(pk=1)
         self.assertEquals(subscriber_updated.next_sequence_number, 2)
@@ -327,7 +327,7 @@ class TestMessageQueueProcessor(TestCase):
         subscriber = Subscription.objects.get(pk=1)
         subscriber.next_sequence_number = 2
         subscriber.save()
-        result = processes_message.delay(subscriber, self.sender)
+        result = processes_message.delay(subscriber.id, self.sender)
         self.assertTrue(result.successful())
         subscriber_updated = Subscription.objects.get(pk=1)
         self.assertEquals(subscriber_updated.completed, True)
@@ -337,7 +337,7 @@ class TestMessageQueueProcessor(TestCase):
         subscriber = Subscription.objects.get(pk=1)
         subscriber.next_sequence_number = 2
         subscriber.save()
-        result = processes_message.delay(subscriber, self.sender)
+        result = processes_message.delay(subscriber.id, self.sender)
         self.assertTrue(result.successful())
         # Check another added and old still there
         all_subscription = Subscription.objects.all()
@@ -349,7 +349,7 @@ class TestMessageQueueProcessor(TestCase):
 
     def test_no_new_subscription_created_post_send_en_baby_2(self):
         subscriber = Subscription.objects.get(pk=4)
-        result = processes_message.delay(subscriber, self.sender)
+        result = processes_message.delay(subscriber.id, self.sender)
         self.assertTrue(result.successful())
         # Check no new subscription added
         all_subscription = Subscription.objects.all()

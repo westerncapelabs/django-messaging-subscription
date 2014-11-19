@@ -94,15 +94,16 @@ def process_message_queue(schedule, sender=None):
     for subscriber in subscribers:
         subscriber.process_status = 1  # In Proceses
         subscriber.save()
-        processes_message.delay(subscriber, sender)
+        processes_message.delay(subscriber.id, sender)
     return subscribers.count()
 
 
 @task()
-def processes_message(subscriber, sender):
+def processes_message(subscriber_id, sender):
     try:
         # Get next message
         try:
+            subscriber = Subscription.objects.get(id=subscriber_id)
             message = Message.objects.get(
                 message_set=subscriber.message_set, lang=subscriber.lang,
                 sequence_number=subscriber.next_sequence_number)
