@@ -108,18 +108,21 @@ def processes_message(subscription_id, sender):
                 message_set=subscription.message_set, lang=subscription.lang,
                 sequence_number=subscription.next_sequence_number)
             # Send messages
-            messages = message.content.split(settings.SUBSCRIPTION_MULTIPART_BOUNDARY)
+            messages = message.content.split(
+                settings.SUBSCRIPTION_MULTIPART_BOUNDARY)
             if len(messages) == 1:
-                response = sender.send_text(subscription.to_addr, message.content)
+                response = sender.send_text(
+                    subscription.to_addr, message.content)
             else:
                 response = []
                 for text in messages:
-                    response.append(sender.send_text(subscription.to_addr, text.strip()))
+                    response.append(
+                        sender.send_text(subscription.to_addr, text.strip()))
             # Post process moving to next message, next set or finished
             # Get set max
             set_max = Message.objects.filter(
                 message_set=subscription.message_set
-                ).aggregate(Max('sequence_number'))["sequence_number__max"]
+            ).aggregate(Max('sequence_number'))["sequence_number__max"]
             # Compare user position to max
             if subscription.next_sequence_number == set_max:
                 # Mark current as completed
