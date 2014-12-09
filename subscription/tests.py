@@ -291,12 +291,12 @@ class TestMessageQueueProcessor(TestCase):
         messagesets = MessageSet.objects.all()
         self.assertEqual(len(messagesets), 10)
         subscriptions = Subscription.objects.all()
-        self.assertEqual(len(subscriptions), 5)
+        self.assertEqual(len(subscriptions), 6)
 
     def test_multisend(self):
         schedule = 6
         result = process_message_queue.delay(schedule, self.sender)
-        self.assertEquals(result.get(), 2)
+        self.assertEquals(result.get(), 3)
         # self.assertEquals(1, 2)
 
     def test_multisend_none(self):
@@ -341,9 +341,9 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check another added and old still there
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 6)
+        self.assertEquals(len(all_subscription), 7)
         # Check new subscription is for baby1
-        new_subscription = Subscription.objects.get(pk=6)
+        new_subscription = Subscription.objects.get(pk=7)
         self.assertEquals(new_subscription.message_set.pk, 4)
         self.assertEquals(new_subscription.to_addr, "+271234")
 
@@ -353,14 +353,35 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check no new subscription added
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 5)
+        self.assertEquals(len(all_subscription), 6)
         # Check old one now inactive and complete
         subscriber_updated = Subscription.objects.get(pk=4)
         self.assertEquals(subscriber_updated.completed, True)
         self.assertEquals(subscriber_updated.active, False)
 
+    def test_send_3_part_message_1_en_subscription(self):
+        subscription = Subscription.objects.get(pk=6)
+        result = processes_message.delay(subscription.id, self.sender)
+        self.assertEqual(result.get(), [{
+            "message_id": result.get()[0]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT1",
+        }, {
+            "message_id": result.get()[1]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT2",
+        }, {
+            "message_id": result.get()[2]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT3",
+        }])
+        subscriber_updated = Subscription.objects.get(pk=6)
+        self.assertEquals(subscriber_updated.next_sequence_number, 2)
+        self.assertEquals(subscriber_updated.process_status, 0)
+
 
 class RecordingAdapter(TestAdapter):
+
     """ Record the request that was handled by the adapter.
     """
     request = None
@@ -371,6 +392,7 @@ class RecordingAdapter(TestAdapter):
 
 
 class TestHttpApiSender(TestCase):
+
     def setUp(self):
         self.session = TestSession()
         self.sender = HttpApiSender(
@@ -451,6 +473,7 @@ class TestHttpApiSender(TestCase):
 
 
 class RecordingHandler(logging.Handler):
+
     """ Record logs. """
     logs = None
 
@@ -461,6 +484,7 @@ class RecordingHandler(logging.Handler):
 
 
 class TestLoggingSender(TestCase):
+
     def setUp(self):
         self.sender = LoggingSender('go_http.test')
         self.handler = RecordingHandler()
