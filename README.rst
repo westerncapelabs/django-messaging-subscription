@@ -39,4 +39,4 @@ be added to ``settings.py`` to configure this app::
     CELERY_RESULT_SERIALIZER = 'pickle'
     CELERY_ALWAYS_EAGER = DEBUG
     SUBSCRIPTION_SEND_INITIAL_DELAYED = 1800 # optional delay in seconds
-
+    SUBSCRIPTION_MULTIPART_BOUNDARY = "-------" 
