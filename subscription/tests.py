@@ -360,6 +360,27 @@ class TestMessageQueueProcessor(TestCase):
         self.assertEquals(subscriber_updated.active, False)
 
 
+    def test_send_3_part_message_1_en_subscription(self):
+        subscription = Subscription.objects.get(pk=6)
+        result = processes_message.delay(subscription.id, self.sender)
+        self.assertEqual(result.get(), [{
+            "message_id": result.get()[0]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT1",
+        },{
+            "message_id": result.get()[1]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT2",
+        },{
+            "message_id": result.get()[2]["message_id"],
+            "to_addr": "+271113",
+            "content": "Message 1 on subscription PT3",
+        }])
+        subscriber_updated = Subscription.objects.get(pk=6)
+        self.assertEquals(subscriber_updated.next_sequence_number, 2)
+        self.assertEquals(subscriber_updated.process_status, 0)
+
+
 class RecordingAdapter(TestAdapter):
     """ Record the request that was handled by the adapter.
     """
