@@ -40,6 +40,9 @@ class MessageSet(models.Model):
     next_set = models.ForeignKey('self',
                                  null=True,
                                  blank=True)
+    default_schedule = models.ForeignKey(PeriodicTask,
+                                         related_name='message_sets',
+                                         null=False)
     created_at = AutoNewDateTimeField(blank=True)
     updated_at = AutoDateTimeField(blank=True)
 
