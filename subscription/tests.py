@@ -346,6 +346,10 @@ class TestMessageQueueProcessor(TestCase):
         new_subscription = Subscription.objects.get(pk=6)
         self.assertEquals(new_subscription.message_set.pk, 4)
         self.assertEquals(new_subscription.to_addr, "+271234")
+        # make sure the new sub is on a different schedule
+        periodictask = PeriodicTask.objects.get(pk=2)
+        self.assertEquals(new_subscription.schedule, periodictask)
+
 
     def test_no_new_subscription_created_post_send_en_baby_2(self):
         subscriber = Subscription.objects.get(pk=4)

@@ -132,6 +132,7 @@ def processes_message(subscriber, sender):
                     subscriber.next_sequence_number = 1
                     subscription = subscriber
                     subscription.message_set = message_set.next_set
+                    subscription.schedule = message_set.next_set.default_schedule
                     subscription.save()
             else:
                 # More in this set so interate by one
