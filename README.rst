@@ -18,7 +18,9 @@ Configuration
 -------------------------------
 
 The following configuration (with dummy values replaced by real ones) needs to
-be added to ``settings.py`` to configure this app::
+be added to ``settings.py`` to configure this app:
+
+.. code-block:: python
 
     INSTALLED_APPS = [
         # Usual Django stuff plus
