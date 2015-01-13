@@ -40,3 +40,9 @@ be added to ``settings.py`` to configure this app::
     CELERY_ALWAYS_EAGER = DEBUG
     SUBSCRIPTION_SEND_INITIAL_DELAYED = 1800 # optional delay in seconds
     SUBSCRIPTION_MULTIPART_BOUNDARY = "-------" 
+
+
+Release Notes
+------------------------------
+0.6.0 - 2015-01-13 - Added support for default schedules on message sets for auto
+transition

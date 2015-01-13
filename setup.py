@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-messaging-subscription",
-    version="0.5.0a",
+    version="0.6.0",
     url="https://github.com/westerncapelabs/django-messaging-subscription",
     license='BSD',
     description=(
