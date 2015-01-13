@@ -199,6 +199,7 @@
         "notes": "Pregnancy sign up before 30 weeks", 
         "next_set": 4, 
         "short_name": "standard", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -210,6 +211,7 @@
         "notes": "Pregnancy sign up after 30 weeks", 
         "next_set": 4, 
         "short_name": "later", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -221,6 +223,7 @@
         "notes": "Pregnancy sign up after 35 weeks", 
         "next_set": 4, 
         "short_name": "accelerated", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -232,6 +235,7 @@
         "notes": "Baby timeline - first batch", 
         "next_set": 5, 
         "short_name": "baby1", 
+        "default_schedule": 2,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -243,6 +247,7 @@
         "notes": "Baby timeline - second batch", 
         "next_set": null, 
         "short_name": "baby2", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -253,7 +258,8 @@
         "created_at": "2014-07-01T10:49:23.571Z", 
         "notes": "Used for miscarriage", 
         "next_set": null, 
-        "short_name": "miscarriage", 
+        "short_name": "miscarriage",
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -265,6 +271,7 @@
         "notes": "Used for still birth", 
         "next_set": null, 
         "short_name": "stillbirth", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -276,6 +283,7 @@
         "notes": "Used for lost baby", 
         "next_set": null, 
         "short_name": "babyloss", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -287,6 +295,7 @@
         "notes": "Used to encourage mothers from public line to go to clinic", 
         "next_set": null, 
         "short_name": "subscription", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
@@ -298,6 +307,7 @@
         "notes": "Used to encourage mothers from CHW line to go to clinic", 
         "next_set": null, 
         "short_name": "chw", 
+        "default_schedule": 1,
         "updated_at": "2014-07-01T10:49:23.572Z"
     }
 },
