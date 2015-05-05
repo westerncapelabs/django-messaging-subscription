@@ -145,6 +145,10 @@ def processes_message(subscription_id, sender):
                     subscription_new.schedule = (
                         message_set.next_set.default_schedule)
                     subscription_new.save()
+                else:
+                    vumi_fire_metric.delay(
+                        metric="sum.finished_messages",
+                        value=1, agg="sum", sender=sender)
             else:
                 # More in this set so interate by one
                 subscription.next_sequence_number = subscription.next_sequence_number + \

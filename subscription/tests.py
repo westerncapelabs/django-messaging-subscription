@@ -287,6 +287,16 @@ class TestMessageQueueProcessor(TestCase):
         logger.setLevel(logging.INFO)
         logger.addHandler(self.handler)
 
+    def check_logs(self, msg):
+        if type(self.handler.logs) != list:
+            [logs] = self.handler.logs
+        else:
+            logs = self.handler.logs
+        for log in logs:
+            if log.msg == msg:
+                return True
+        return False
+
     def test_data_loaded(self):
         messagesets = MessageSet.objects.all()
         self.assertEqual(len(messagesets), 10)
@@ -361,6 +371,8 @@ class TestMessageQueueProcessor(TestCase):
         subscriber_updated = Subscription.objects.get(pk=4)
         self.assertEquals(subscriber_updated.completed, True)
         self.assertEquals(subscriber_updated.active, False)
+        # Check finished_messages metric fired
+        self.check_logs("Metric: 'finished_messages' [sum] -> 1")
 
     def test_send_3_part_message_1_en_subscription(self):
         subscription = Subscription.objects.get(pk=6)
