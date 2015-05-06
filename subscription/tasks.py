@@ -130,6 +130,11 @@ def processes_message(subscription_id, sender):
                 subscription.active = False
                 subscription.process_status = 2  # Completed
                 subscription.save()
+                # fire completed metric
+                vumi_fire_metric.delay(
+                    metric="sum.%s_completed" %
+                    (subscription.message_set.short_name, ),
+                    value=1, agg="sum", sender=sender)
                 # If next set defined create new subscription
                 message_set = subscription.message_set
                 if message_set.next_set:

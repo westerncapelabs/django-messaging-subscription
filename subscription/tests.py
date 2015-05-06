@@ -359,6 +359,11 @@ class TestMessageQueueProcessor(TestCase):
         # make sure the new sub is on a different schedule
         periodictask = PeriodicTask.objects.get(pk=2)
         self.assertEquals(new_subscription.schedule, periodictask)
+        # Check finished_messages metric not fired
+        self.assertEquals(
+            False, self.check_logs("Metric: 'sum.finished_messages' [sum] -> 1"))
+        self.assertEquals(
+            True, self.check_logs("Metric: u'sum.accelerated_completed' [sum] -> 1"))
 
     def test_no_new_subscription_created_post_send_en_baby_2(self):
         subscription = Subscription.objects.get(pk=4)
@@ -372,7 +377,10 @@ class TestMessageQueueProcessor(TestCase):
         self.assertEquals(subscriber_updated.completed, True)
         self.assertEquals(subscriber_updated.active, False)
         # Check finished_messages metric fired
-        self.check_logs("Metric: 'finished_messages' [sum] -> 1")
+        self.assertEquals(
+            True, self.check_logs("Metric: 'sum.finished_messages' [sum] -> 1"))
+        self.assertEquals(
+            True, self.check_logs("Metric: u'sum.baby2_completed' [sum] -> 1"))
 
     def test_send_3_part_message_1_en_subscription(self):
         subscription = Subscription.objects.get(pk=6)
