@@ -1,7 +1,7 @@
 django-messaging-subscription
 ================================
 
-A RESTful API for managing messaging content, subscriptions and sending 
+A RESTful API for managing messaging content, subscriptions and sending
 via Vumi-go
 
 
@@ -41,10 +41,11 @@ be added to ``settings.py`` to configure this app:
     CELERY_RESULT_SERIALIZER = 'pickle'
     CELERY_ALWAYS_EAGER = DEBUG
     SUBSCRIPTION_SEND_INITIAL_DELAYED = 1800 # optional delay in seconds
-    SUBSCRIPTION_MULTIPART_BOUNDARY = "-------" 
+    SUBSCRIPTION_MULTIPART_BOUNDARY = "-------"
 
 
 Release Notes
 ------------------------------
+0.7.0 - 2015-05-06 - Added support for firing metrics on completion of sets
 0.6.0 - 2015-01-13 - Added support for default schedules on message sets for auto
 transition
