@@ -38,7 +38,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 DATABASES = {
@@ -81,4 +80,3 @@ CELERY_ALWAYS_EAGER = True
 
 SUBSCRIPTION_SEND_INITIAL_DELAYED = 0
 SUBSCRIPTION_MULTIPART_BOUNDARY = "-------"
-

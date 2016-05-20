@@ -46,6 +46,7 @@ be added to ``settings.py`` to configure this app:
 
 Release Notes
 ------------------------------
+0.7.1 - 2016-05-20 - Pin and bump of dependency versions
 0.7.0 - 2015-05-06 - Added support for firing metrics on completion of sets
 0.6.0 - 2015-01-13 - Added support for default schedules on message sets for auto
 transition

@@ -439,7 +439,7 @@ class TestHttpApiSender(TestCase):
             account_key="acc-key", conversation_key="conv-key",
             conversation_token="conv-token")
         self.assertEqual(sender.api_url,
-                         "http://go.vumi.org/api/v1/go/http_api_nostream")
+                         "https://go.vumi.org/api/v1/go/http_api_nostream")
 
     def check_request(self, request, method, data=None, headers=None):
         self.assertEqual(request.method, method)
