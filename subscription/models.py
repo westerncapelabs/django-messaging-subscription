@@ -8,6 +8,7 @@ from django.db.models import DateTimeField
 from django.conf import settings
 
 from go_http.send import HttpApiSender as sendHttpApiSender
+from south.modelsinspector import add_introspection_rules
 
 
 # Modelled on https://github.com/jamesmarlowe/django-AutoDateTimeFields
@@ -93,14 +94,12 @@ class Subscription(models.Model):
     def __unicode__(self):
         return "%s to %s" % (self.contact_key, self.message_set.short_name)
 
-
-from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^subscription\.models\.AutoNewDateTimeField",
                              "^subscription\.models\.AutoDateTimeField"])
 
 # Auth set up stuff to ensure apikeys are created
 # ensures endpoints require username and api_key values to access
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model  # noqa
 user_model = get_user_model()
 
 

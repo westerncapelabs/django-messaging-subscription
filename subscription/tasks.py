@@ -156,8 +156,8 @@ def processes_message(subscription_id, sender):
                         value=1, agg="sum", sender=sender)
             else:
                 # More in this set so interate by one
-                subscription.next_sequence_number = subscription.next_sequence_number + \
-                    1
+                subscription.next_sequence_number = \
+                    subscription.next_sequence_number + 1
                 subscription.process_status = 0  # Ready
                 subscription.save()
             return response

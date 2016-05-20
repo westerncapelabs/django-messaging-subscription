@@ -6,7 +6,8 @@ setup(
     url="https://github.com/westerncapelabs/django-messaging-subscription",
     license='BSD',
     description=(
-        "A RESTful API for managing messaging content, subscriptions and sending via Vumi-go"),
+        "A RESTful API for managing messaging content, subscriptions and "
+        "sending via Vumi-go"),
     long_description=open('README.rst', 'r').read(),
     author='Western Cape Labs',
     author_email='devops@westerncapelabs.com',
