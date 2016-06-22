@@ -301,12 +301,12 @@ class TestMessageQueueProcessor(TestCase):
         messagesets = MessageSet.objects.all()
         self.assertEqual(len(messagesets), 10)
         subscriptions = Subscription.objects.all()
-        self.assertEqual(len(subscriptions), 6)
+        self.assertEqual(len(subscriptions), 7)
 
     def test_multisend(self):
         schedule = 6
         result = process_message_queue.delay(schedule, self.sender)
-        self.assertEquals(result.get(), 3)
+        self.assertEquals(result.get(), 4)
         # self.assertEquals(1, 2)
 
     def test_multisend_none(self):
@@ -351,9 +351,9 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check another added and old still there
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 7)
+        self.assertEquals(len(all_subscription), 8)
         # Check new subscription is for baby1
-        new_subscription = Subscription.objects.get(pk=7)
+        new_subscription = Subscription.objects.get(pk=8)
         self.assertEquals(new_subscription.message_set.pk, 4)
         self.assertEquals(new_subscription.to_addr, "+271234")
         # make sure the new sub is on a different schedule
@@ -373,7 +373,7 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check no new subscription added
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 6)
+        self.assertEquals(len(all_subscription), 7)
         # Check old one now inactive and complete
         subscriber_updated = Subscription.objects.get(pk=4)
         self.assertEquals(subscriber_updated.completed, True)
@@ -405,6 +405,14 @@ class TestMessageQueueProcessor(TestCase):
         subscriber_updated = Subscription.objects.get(pk=6)
         self.assertEquals(subscriber_updated.next_sequence_number, 2)
         self.assertEquals(subscriber_updated.process_status, 0)
+
+    def test_noop_message_3_en_subscription(self):
+        subscription = Subscription.objects.get(pk=7)
+        result = processes_message.delay(subscription.id, self.sender)
+        self.assertEqual(result.get(), [])
+        subscriber_updated = Subscription.objects.get(pk=7)
+        self.assertEquals(subscriber_updated.next_sequence_number, 3)
+        self.assertEquals(subscriber_updated.process_status, 2)
 
 
 class RecordingAdapter(TestAdapter):
