@@ -42,10 +42,12 @@ be added to ``settings.py`` to configure this app:
     CELERY_ALWAYS_EAGER = DEBUG
     SUBSCRIPTION_SEND_INITIAL_DELAYED = 1800 # optional delay in seconds
     SUBSCRIPTION_MULTIPART_BOUNDARY = "-------"
+    SUBSCRIPTION_NOOP_KEYWORD = "SKIPSEND"
 
 
 Release Notes
 ------------------------------
+0.8.0 - 2016-06-22 - Add support for not sending on certain days
 0.7.1 - 2016-05-20 - Pin and bump of dependency versions
 0.7.0 - 2015-05-06 - Added support for firing metrics on completion of sets
 0.6.0 - 2015-01-13 - Added support for default schedules on message sets for auto
