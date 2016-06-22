@@ -111,8 +111,11 @@ def processes_message(subscription_id, sender):
             messages = message.content.split(
                 settings.SUBSCRIPTION_MULTIPART_BOUNDARY)
             if len(messages) == 1:
-                response = sender.send_text(
-                    subscription.to_addr, message.content)
+                if message.content == settings.SUBSCRIPTION_NOOP_KEYWORD:
+                    response = []
+                else:
+                    response = sender.send_text(
+                        subscription.to_addr, message.content)
             else:
                 response = []
                 for text in messages:
