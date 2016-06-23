@@ -411,7 +411,9 @@ class TestMessageQueueProcessor(TestCase):
         result = processes_message.delay(subscription.id, self.sender)
         self.assertEqual(result.get(), [])
         subscriber_updated = Subscription.objects.get(pk=7)
+        # Still 3 because last message in set
         self.assertEquals(subscriber_updated.next_sequence_number, 3)
+        # Set to 2 as that means set is completed
         self.assertEquals(subscriber_updated.process_status, 2)
 
 
