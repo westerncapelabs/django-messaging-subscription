@@ -55,3 +55,6 @@ target/
 
 # Venv
 /ve/
+
+# OSX
+.DS_Store
