@@ -17,7 +17,7 @@ setup(
         'Django',
         'django-tastypie==0.12.2',
         'South',
-        'gunicorn==19.0.0',
+        'gunicorn==19.5.0',
         'django-celery==3.1.10',
         'go-http==0.3.0',
     ],
